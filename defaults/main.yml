@@ -1,0 +1,19 @@
+---
+# defaults file for this role
+openshift_user: vagrant
+openshift_group: vagrant
+openshift_vagrant: yes
+openshift_http_proxy: "{{ lookup('env', 'http_proxy') }}"
+openshift_https_proxy: "{{ lookup('env', 'https_proxy') }}"
+openshift_docker_no_proxy: "localhost,127.0.0.1,172.30.1.1"
+openshift_docker_insecure_reg: 172.30.0.0/16
+openshift_docker_execstart: /usr/bin/dockerd --insecure-registry "{{ openshift_docker_insecure_reg }}"
+openshift_validate_certs: no
+
+openshift_oc_url: https://github.com/openshift/origin/releases/download
+openshift_oc_version: v1.5.1
+openshift_oc_version_hash: 7b451fc
+openshift_oc_filename: "openshift-origin-client-tools-{{ openshift_oc_version }}-{{ openshift_oc_version_hash }}-linux-64bit"
+openshift_oc_sha256: 1e5f73098c3e3bf6f887c8678c078f650e62c477eca255c0f131d6b6be805c6c
+openshift_oc_public_hostname: 127.0.0.1
+openshift_oc_path: /usr/local/sbin

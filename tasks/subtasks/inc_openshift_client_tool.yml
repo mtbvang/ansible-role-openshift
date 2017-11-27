@@ -1,0 +1,57 @@
+- name: Openshift client tool download stat
+  stat: path=/tmp/"{{ openshift_oc_filename }}.tar.gz"
+  register: oc_download_stat
+  tags: oc,openshift 
+  
+- name: Openshift client tool download
+  get_url:
+    url: "{{ openshift_oc_url }}/{{ openshift_oc_version }}/{{ openshift_oc_filename }}.tar.gz"
+    dest: /tmp/{{ openshift_oc_filename }}.tar.gz
+    sha256sum: "{{ openshift_oc_sha256 }}"
+    validate_certs: no
+  environment: 
+    https_proxy: "{{ openshift_http_proxy }}"
+    http_proxy: "{{ openshift_http_proxy }}"
+  become: yes
+  when: oc_download_stat.stat.exists == false
+  tags: oc,openshift 
+  
+- name: Openshift client tool extraction stat
+  stat: path=/tmp/"{{ openshift_oc_filename }}"
+  register: oc_extract_stat
+  tags: oc,openshift 
+  
+- name: Openshift client tool extract
+  unarchive:
+    src: /tmp/{{ openshift_oc_filename }}.tar.gz
+    dest: /tmp/
+    remote_src: yes  
+    validate_certs: no
+  become: yes
+  when: oc_extract_stat.stat.exists == false
+  tags: oc,openshift 
+  
+- name: Openshift client tool stat
+  shell: /usr/local/sbin/oc version
+  register: oc_stat
+  ignore_errors: yes
+  tags: oc,openshift
+  
+- name: Openshift client tool install
+  command: mv /tmp/"{{ openshift_oc_filename }}"/oc /usr/local/sbin/oc  
+  when: oc_stat.stdout.find(openshift_oc_version) == -1
+  tags: oc,openshift 
+
+# Start Tests
+- name: Test oc commandline tool test by testing for version
+  shell: /usr/local/sbin/oc version
+  become_user: "{{ openshift_user }}"
+  register: octestoutput
+  ignore_errors: yes
+  tags: oc,test
+    
+- name: Test oc commandline tool test version output check
+  fail:
+    msg: "oc commandline tool version run didn't return expected result"   
+  when: octestoutput.stdout.find("oc " + openshift_oc_version) == -1
+  tags: oc,test

@@ -1,0 +1,42 @@
+# Tests that role installs as expected with defaults. Which includes with no proxies.
+# - name: Test that docker is working (no proxy) with hello-world test
+  
+- name: Test that openshift_user has been added to docker group
+  command: groups "{{ openshift_user }}"
+  become: yes
+  register: usergroups
+  tags: docker,test
+  
+- name: Check openshift_user has been added to docker group  
+  fail:
+    msg: "User {{ openshift_user }} has not been added to docker group." 
+  when: usergroups.stdout.find("docker") == -1
+  tags: docker,test
+  
+- name: Run hello world with proxy
+  shell: docker run hello-world
+  become: yes 
+  register: dockeroutput
+  ignore_errors: yes
+  tags: docker,test
+# Fail if hellow docker didn't work and proxy settings are dected on host.  
+- name: Check result of hello world test
+  fail:
+    msg: "'Hello world check failed"
+  # Existence of proxy is dected through http_proy env variable.   
+  when: (dockeroutput.stdout.find("Hello from Docker!") == -1) and
+    (lookup('env','http_proxy') is undefined == 'False')
+  tags: docker,test
+    
+- name: Test admin user added to cluster-admin group
+  shell: /usr/local/sbin/oc login -u admin -p admin 
+  register: adminlogin
+  ignore_errors: yes
+  tags: oc,ocadminuser,test
+- name: Check that default project is listed for admin login
+  fail:
+    msg: "admin user doesn't appear to be in cluster-admin group because project default is not listed on login."
+  # Existence of proxy is dected through http_proy env variable.   
+  when: adminlogin.stdout.find("default") == -1
+  tags: oc,ocadminuser,test
+    

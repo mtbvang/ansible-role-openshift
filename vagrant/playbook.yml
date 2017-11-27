@@ -1,0 +1,8 @@
+---
+- name: Install role
+  become: true
+  hosts: 
+    - all
+    
+  roles:
+    - ../../ansible-role-openshift

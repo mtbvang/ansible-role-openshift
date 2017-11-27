@@ -1,0 +1,78 @@
+---
+# tasks file for this role
+
+- include: Ubuntu.yml
+  when: ansible_distribution == 'Ubuntu'
+
+- include: RedHat.yml
+  when: ansible_os_family == 'RedHat'
+
+# List of tools installed
+- include: ./subtasks/inc_ssh_keys.yml
+- include: ./subtasks/inc_openshift_client_tool.yml
+- include: ./subtasks/inc_docker_config.yml
+
+- meta: flush_handlers 
+
+- name: oc cluster up stat
+  command: /usr/local/sbin/oc cluster status
+  become: yes
+  register: occlusterup
+  ignore_errors: yes
+  tags: oc,clusterup
+
+- name: oc cluster up
+  command: /usr/local/sbin/oc cluster up --http-proxy "{{ openshift_http_proxy }}" --https-proxy "{{ openshift_https_proxy }}" --no-proxy "{{ openshift_docker_no_proxy }}" --public-hostname "{{ openshift_oc_public_hostname }}"
+  become: yes
+  when: occlusterup.stdout.find("not running") != -1
+  tags: oc,clusterup
+
+- name: Stat admin user account
+  shell: >
+    /usr/local/sbin/oc login -u system:admin 
+    && /usr/local/sbin/oc get users
+  register: users
+  ignore_errors: yes
+  tags: oc,ocadminuser 
+
+- name: Debugging task. Change as required for debugging.
+  debug:
+    var: users
+    verbosity: 1
+  tags: debugtests,ocadminuser
+  
+- name: add admin user account
+  shell: >
+    /usr/local/sbin/oc login -u system:admin &&
+    /usr/local/sbin/oc create user admin
+  when: users.stdout.find("anypassword:admin") == -1
+  tags: oc,ocadminuser
+
+- name: Stat login as admin user account
+  shell: >
+    /usr/local/sbin/oc login -u admin -p admin
+  register: projects
+  ignore_errors: yes
+  tags: oc,ocadminuser 
+  
+- name: add admin user account
+  shell: >
+    /usr/local/sbin/oc login -u system:admin &&
+    /usr/local/sbin/oc adm policy add-cluster-role-to-user cluster-admin admin
+  when: projects.stdout.find("default") == -1
+  tags: oc,ocadminuser
+  
+- name: Test login as admin user account
+  shell: >
+    /usr/local/sbin/oc login -u admin -p admin
+  register: adminlogin
+  ignore_errors: yes
+  tags: oc,ocadminuser 
+
+- name: Check result of admin login. Admin should be part of cluster-admin role.
+  fail:
+    msg: "'admin user not in cluster-admin role"   
+  when: adminlogin.stdout.find("default") == -1
+  tags: oc,ocadminuser
+  
+- include: ../tests/inc_tests.yml

@@ -1,0 +1,39 @@
+- name: Create systemd configuration directory for Docker service (systemd)
+  file:
+    dest: /etc/systemd/system/docker.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: 0644
+  when: is_systemd
+
+- name: Set docker start up options for oc cluster up.
+  copy:
+    content: |
+      [Service]
+      EnvironmentFile=-/etc/sysconfig/docker
+      ExecStart=
+      ExecStart={{ openshift_docker_execstart }}
+      Environment="HTTP_PROXY={{ openshift_http_proxy }}" "NO_PROXY={{ openshift_docker_no_proxy }}"
+    dest: /etc/systemd/system/docker.service.d/docker.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - reload unit
+    - restart docker
+  tags: docker
+
+- file:
+    path: /etc/sysconfig
+    state: directory
+    mode: 0755
+
+- name: Install docker system config file cp -f /vagrant/provision/docker /etc/sysconfig/docker 
+  copy:
+    src: docker
+    dest: /etc/sysconfig/docker
+    owner: root
+    group: root
+    mode: 0644
+  tags: docker

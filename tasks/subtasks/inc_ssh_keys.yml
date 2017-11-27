@@ -1,0 +1,62 @@
+- file:
+    path: /home/{{ openshift_user }}/.ssh
+    state: directory
+    mode: 0700
+  become: true
+  become_user: "{{ openshift_user }}"
+  tags: ssh
+
+- name: Install ssh knownhosts for user
+  copy:
+    src: known_hosts
+    dest: /home/{{ openshift_user }}/.ssh/known_hosts
+    owner: "{{ openshift_user }}"
+    group: "{{ openshift_group }}"
+    mode: 0644
+  become: true
+  become_user: "{{ openshift_user }}"
+  tags: ssh
+  
+#- name: Install ssh dev private key for user
+#  copy:
+#    src: dev
+#    dest: /home/{{ openshift_user }}/.ssh/dev
+#    owner: "{{ openshift_user }}"
+#    group: "{{ openshift_group }}"
+#    mode: 0600
+#  become: true
+#  become_user: "{{ openshift_user }}"
+#  tags: ssh
+#    
+#- name: Install ssh dev public key for user
+#  copy:
+#    src: dev.pub
+#    dest: /home/{{ openshift_user }}/.ssh/dev.pub
+#    owner: "{{ openshift_user }}"
+#    group: "{{ openshift_group }}"
+#    mode: 0644
+#  become: true
+#  become_user: "{{ openshift_user }}"
+#  tags: ssh
+#  
+#  # Start Tests    
+#- name: Test ssh keys
+#  shell: eval "$(ssh-agent)" && ssh-add /home/{{ openshift_user }}/.ssh/dev && ssh -T -o StrictHostKeyChecking=no {{ openshift_user }}@10.53.99.81
+#  async: 6
+#  poll: 2
+#  become_user: "{{ openshift_user }}"
+#  register: sshoutput
+#  ignore_errors: yes
+#  become: true
+#  tags: tests,ssh
+#  
+#- debug: msg="{{ sshoutput }}"  
+#  tags: tests,ssh
+#
+#- name: Test ssh keys - check result of ssh
+#  fail:
+#    msg: "'ssh failed"
+#  when: 
+#    - "sshoutput.rc != 0"
+#    - ansible_os_family != 'RedHat'
+#  tags: tests,ssh

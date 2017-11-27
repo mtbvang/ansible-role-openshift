@@ -1,0 +1,7 @@
+---
+# The project name is prefixed to the variable name to avoid collisions.
+
+# vars file for this role
+openshift_ansible_version: 2.2.1.0-1.el7
+openshift_git_version: 1.8.3.1-6.el7_2.1
+openshift_wget_version: 1.14-13.el7
