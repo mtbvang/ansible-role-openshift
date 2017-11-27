@@ -250,9 +250,6 @@ task testComponentFromHost() {
 
 task testIntegrationFromScratch(dependsOn: 'recreate') {
     description 'Does a vagrant destroy and then integration tests the role. Calls recreate. This task is here more for documentation and convenience.'
-    doFirst { 
-       commandLine "bash", "-c", "VB_GUEST=false vagrant destroy -f ${vagrantVMName} && vagrant up ${vagrantVMName}"
-    }
     group = "Testing"  
 }
 
