@@ -11,24 +11,22 @@ VM_GUI = ENV['VM_GUI'] == 'true' ? true : false
 VB_GUEST = ENV['VB_GUEST'] == 'true' ? true : false
 # Set env var ANSIBLE_GALAXY_FORCE='' to NOT force install of roles
 ANSIBLE_GALAXY_FORCE = ENV['ANSIBLE_GALAXY_FORCE'] || "--force"
-HTTP_PROXY = ENV['VAGRANT_HTTP_PROXY'] || ENV['http_proxy']
-HTTPS_PROXY = ENV['VAGRANT_HTTPS_PROXY'] || ENV['http_proxy']
-NO_PROXY = ENV['VAGRANT_NO_PROXY'] || "no_proxy"
+HTTP_PROXY = ENV['VAGRANT_HTTP_PROXY'] || ENV['HTTP_PROXY']
+HTTPS_PROXY = ENV['VAGRANT_HTTPS_PROXY'] || ENV['HTTP_PROXY']
+NO_PROXY = ENV['VAGRANT_NO_PROXY'] || "NO_PROXY"
 OPENSHIFT_PORT_HOST = ENV['OPENSHIFT_PORT_HOST'] || 8453
 
 
 boxes = [
   {
   :name => "centos",
-  :box => "box-cutter/centos73-desktop",
-  :version => "2.0.21",
+  :box => "boxcutter/centos7-desktop",
   :cpu => VM_CPU_CAP,
   :ram => VM_MEMORY
   },
   {
   :name => "ubuntu",
-  :box => "box-cutter/ubuntu1604-desktop",
-  :version => "2.0.26",
+  :box => "boxcutter/ubuntu1604-desktop",
   :cpu => VM_CPU_CAP,
   :ram => VM_MEMORY
   },
@@ -45,9 +43,13 @@ Vagrant.configure("2") do |config|
   end
 
   if Vagrant.has_plugin?("vagrant-proxyconf")
-    config.proxy.http     = HTTP_PROXY
-    config.proxy.https    = HTTPS_PROXY
-    config.proxy.no_proxy = NO_PROXY
+    if(HTTP_PROXY.nil? || HTTP_PROXY.empty? || HTTP_PROXY == 'null')
+      config.proxy.enabled = false
+    else
+      config.proxy.http = HTTP_PROXY
+      config.proxy.https = HTTPS_PROXY
+      config.proxy.no_proxy = NO_PROXY
+    end
   end
 
   boxes.each do |box|

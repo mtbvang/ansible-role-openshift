@@ -6,7 +6,17 @@ Installs a single cluster instance of openshift for development environment use.
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+This role comes with Vagrant and gradle build enabled. Vagrant 2.0.1 is required to test the role using virtual machines.
+
+The vagrant boxes need to be built using the gradle task:
+
+```
+./gradlew packer
+```
+
+Usage
+-----
+
 
 Role Variables
 --------------

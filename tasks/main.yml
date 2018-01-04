@@ -21,12 +21,22 @@
   ignore_errors: yes
   tags: oc,clusterup
 
-- name: oc cluster up
+- name: oc cluster up with proxy
   command: /usr/local/sbin/oc cluster up --http-proxy "{{ openshift_http_proxy }}" --https-proxy "{{ openshift_https_proxy }}" --no-proxy "{{ openshift_docker_no_proxy }}" --public-hostname "{{ openshift_oc_public_hostname }}"
   become: yes
-  when: occlusterup.stdout.find("not running") != -1
+  when: 
+    - occlusterup.stdout.find("not running") != -1
+    - openshift_http_proxy != ""
   tags: oc,clusterup
 
+- name: oc cluster up without proxy
+  command: /usr/local/sbin/oc cluster up --public-hostname "{{ openshift_oc_public_hostname }}"
+  become: yes
+  when: 
+    - occlusterup.stdout.find("not running") != -1
+    - openshift_http_proxy == ""
+  tags: oc,clusterup
+  
 - name: Stat admin user account
   shell: >
     /usr/local/sbin/oc login -u system:admin 
