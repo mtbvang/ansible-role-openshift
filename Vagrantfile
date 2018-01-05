@@ -87,7 +87,7 @@ Vagrant.configure("2") do |config|
         inline: "sudo apt-get update && sudo apt-get -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confnew' install -y -qq build-essential curl git libssl-dev libffi-dev python-dev python-pip"
       end
      
-      vms.vm.provision :ansible_local do |ansible|
+      vms.vm.provision "ansible", type: :ansible_local do |ansible|
         ansible.verbose = "v"
         ansible.install_mode = "pip"
         ansible.version = "2.4.2.0"
