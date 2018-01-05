@@ -1,11 +1,13 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+PROJECT_NAME = ENV['PROJECT_NAME'] || File.basename(File.expand_path(File.dirname(__FILE__)))
+
 #
 # Environment variables that can be overriden on vagrant up
 #
 VM_CPUS = ENV['VM_CPUS'] || 2
-VM_CPU_CAP = ENV['VM_CPU_CAP'] || 80
+VM_CPU_CAP = ENV['VM_CPU_CAP'] || 100 
 VM_MEMORY = ENV['VM_MEMORY'] || 1024
 VM_GUI = ENV['VM_GUI'] == 'true' ? true : false
 VB_GUEST = ENV['VB_GUEST'] == 'true' ? true : false
@@ -44,6 +46,7 @@ Vagrant.configure("2") do |config|
 
   if Vagrant.has_plugin?("vagrant-proxyconf")
     if(HTTP_PROXY.nil? || HTTP_PROXY.empty? || HTTP_PROXY == 'null')
+      puts "Disabling proxy conf plugin. No proxy settings found."
       config.proxy.enabled = false
     else
       config.proxy.http = HTTP_PROXY
@@ -58,6 +61,12 @@ Vagrant.configure("2") do |config|
       
       vms.vm.network "forwarded_port", guest: 8443, host: OPENSHIFT_PORT_HOST  # Openshift console
 
+      @syncfolder_type = 'virtualbox'
+      if Vagrant::Util::Platform.windows? then
+          syncfolder_type = 'nfs'
+      end
+      vms.vm.synced_folder '../', '/vagrant', type: syncfolder_type , disabled: false
+      
       vms.vm.provider "virtualbox" do |v|
         v.gui = VM_GUI
         v.cpus = VM_CPUS
@@ -65,24 +74,30 @@ Vagrant.configure("2") do |config|
         v.customize ["modifyvm", :id, "--memory", box[:ram]]
         v.customize ["modifyvm", :id, "--ioapic", "on"]
         v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-        vms.vm.synced_folder '../', '/vagrant', type: "virtualbox", disabled: false
       end
 
-      if box[:name].eql? "ubuntu-xenial"
+      # Work around for epel bug https://bugs.centos.org/view.php?id=13669&nbn=1
+      if box[:name].eql? "centos"
         vms.vm.provision "shell",
-        inline: "echo 'Installing python 2 required by Ansible.' && sudo apt-get -y install python-minimal"
+        inline: "sudo rpm -ivh --replacepkgs https://kojipkgs.fedoraproject.org/packages/http-parser/2.7.1/3.el7/x86_64/http-parser-2.7.1-3.el7.x86_64.rpm"
       end
-
-      vms.vm.provision :ansible do |ansible|
+    
+      if box[:name].eql? "ubuntu"
+        vms.vm.provision "shell",
+        inline: "sudo apt-get update && sudo apt-get -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confnew' install -y -qq build-essential curl git libssl-dev libffi-dev python-dev python-pip"
+      end
+     
+      vms.vm.provision :ansible_local do |ansible|
         ansible.verbose = "v"
-        ansible.playbook = "vagrant/playbook.yml"
-        ansible.galaxy_role_file = "requirements.yml"
-        ansible.galaxy_roles_path = "vagrant/roles"
+        ansible.install_mode = "pip"
+        ansible.version = "2.4.2.0"
+        ansible.playbook = "#{PROJECT_NAME}/vagrant/playbook.yml"
+        ansible.galaxy_role_file = "#{PROJECT_NAME}/requirements.yml"
+        ansible.galaxy_roles_path = "#{PROJECT_NAME}/vagrant/roles"
         ansible.galaxy_command = "ansible-galaxy install --ignore-certs --role-file=%{role_file} --roles-path=%{roles_path} #{ANSIBLE_GALAXY_FORCE}"
-        ansible.sudo = true
+        ansible.become = true
       end
     end
   end
-
 end
 
