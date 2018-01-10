@@ -91,9 +91,9 @@ Vagrant.configure("2") do |config|
         ansible.verbose = "v"
         ansible.install_mode = "pip"
         ansible.version = "2.4.2.0"
-        ansible.playbook = "#{PROJECT_NAME}/vagrant/playbook.yml"
+        ansible.playbook = "#{PROJECT_NAME}/tests/playbook.yml"
         ansible.galaxy_role_file = "#{PROJECT_NAME}/requirements.yml"
-        ansible.galaxy_roles_path = "#{PROJECT_NAME}/vagrant/roles"
+        ansible.galaxy_roles_path = "#{PROJECT_NAME}/tests/roles"
         ansible.galaxy_command = "ansible-galaxy install --ignore-certs --role-file=%{role_file} --roles-path=%{roles_path} #{ANSIBLE_GALAXY_FORCE}"
         ansible.become = true
       end

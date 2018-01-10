@@ -76,11 +76,12 @@ ext.runAnsibleTagsFromHost = { tags, rolesPath, verbosity ->
 }
 
 ext.ansibleGalaxyCleanAndInstall = { 
-    description 'Run ansible galaxy from with in the guest VM. Calls the provision/ansible_galaxy.sh script that cleans and updates all roles.'
-    exec { 
-        commandLine "bash", "-c", "vagrant ssh $vagrantVMName -c '/vagrant/${project.name}/tests/ansible_galaxy.sh ${project.name} --force'" 
-    }
+	description 'Run ansible galaxy from with in the guest VM. Calls the provision/ansible_galaxy.sh script that cleans and updates all roles.'
+	exec { 
+		commandLine "bash", "-c", "vagrant ssh $vagrantVMName -c '/vagrant/${project.name}/tests/ansible_galaxy.sh ${project.name} --force'" 
+	}
 }
+
 task ansibleRunTags() {
     description = 'Runs ansible tags on the vagrant guest without the vagrant overhead. Useful for testing. \n' \
         + "* Parameter: tags - default=''. List of tags to run. \n" \
