@@ -190,7 +190,7 @@ task destroy() {
     }
 }
 
-task recreate(dependsOn: ['destroy', 'up']) { 
+task recreate(dependsOn: ['destroy', 'vagrantUp']) { 
     description 'Destroy and up the local development VM' 
     // Ensure task ordering for recreate
     up.mustRunAfter(destroy)
