@@ -6,7 +6,6 @@
 
 # List of tools installed
 - include: ./subtasks/inc_ssh_keys.yml
-- include: ./subtasks/inc_openshift_client_tool.yml
 - include: ./subtasks/inc_docker_config.yml
 
 - meta: flush_handlers 

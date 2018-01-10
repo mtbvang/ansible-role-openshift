@@ -70,7 +70,7 @@ ext.runAnsibleTagsFromGuest = { tags, rolesPath, verbosity ->
 ext.runAnsibleTagsFromHost = { tags, rolesPath, verbosity ->     
     description 'Run ansible tasks specified by commandline property named tags. Same as runAsnibleTagsFromGuest but runnable from the VM host.'
     exec {
-       commandLine "bash", "-c", "vagrant ssh $vagrantVMName -c 'ANSIBLE_ROLES_PATH=${rolesPath} ansible-playbook --sudo -i \'all,\' -c local /vagrant/${project.name}/vagrant/playbook.yml -${verbosity} --tags=${tags}'"    
+       commandLine "bash", "-c", "vagrant ssh $vagrantVMName -c 'ANSIBLE_ROLES_PATH=${rolesPath} ansible-playbook --sudo -i \'localhost,\' -c local /vagrant/${project.name}/tests/playbook.yml -${verbosity} --tags=${tags}'"    
     }
     
 }

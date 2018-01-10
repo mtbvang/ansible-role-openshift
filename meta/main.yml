@@ -32,5 +32,6 @@ dependencies:
     docker_version_rhel: 1.13.1
     docker_version_deb: 1.13.1*
     docker_yum_state: present
-
+  - src: https://github.com/mtbvang/ansible-role-openshift_client
+    name: openshift_client
   
