@@ -1,9 +1,6 @@
 ---
 # tasks file for this role
 
-- include: Ubuntu.yml
-  when: ansible_distribution == 'Ubuntu'
-
 - include: RedHat.yml
   when: ansible_os_family == 'RedHat'
 

@@ -25,13 +25,7 @@ boxes = [
   :box => "boxcutter/centos7-desktop",
   :cpu => VM_CPU_CAP,
   :ram => VM_MEMORY
-  },
-  {
-  :name => "ubuntu",
-  :box => "boxcutter/ubuntu1604-desktop",
-  :cpu => VM_CPU_CAP,
-  :ram => VM_MEMORY
-  },
+  }
 ]
 
 Vagrant.configure("2") do |config|
@@ -78,11 +72,6 @@ Vagrant.configure("2") do |config|
       if box[:name].eql? "centos"
         vms.vm.provision "shell",
         inline: "sudo rpm -ivh --replacepkgs https://kojipkgs.fedoraproject.org/packages/http-parser/2.7.1/3.el7/x86_64/http-parser-2.7.1-3.el7.x86_64.rpm"
-      end
-    
-      if box[:name].eql? "ubuntu"
-        vms.vm.provision "shell",
-        inline: "sudo apt-get update && sudo apt-get -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confnew' install -y -qq build-essential curl git libssl-dev libffi-dev python-dev python-pip"
       end
      
       vms.vm.provision "ansible", type: :ansible_local do |ansible|
