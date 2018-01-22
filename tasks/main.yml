@@ -82,3 +82,9 @@
   tags: oc,ocadminuser
   
 - include: ../tests/inc_tests.yml
+
+- name: Shut openshift down
+  shell: >
+    /usr/local/sbin/oc cluster down
+  ignore_errors: yes
+  tags: oc,clusterdown 
