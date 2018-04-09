@@ -18,11 +18,6 @@ dependencies:
       https_proxy: "{{ openshift_http_proxy }}"
       http_proxy: "{{ openshift_http_proxy }}"
     when: ansible_os_family == 'RedHat'
-  - src: https://github.com/mtbvang/ansible-role-ansible
-    name: ansible
-    ansible_proxy_env: 
-      https_proxy: "{{ openshift_http_proxy }}"
-      http_proxy: "{{ openshift_http_proxy }}"
   - src: https://github.com/mtbvang/ansible-role-docker-1
     name: docker
     docker_http_proxy: "{{ openshift_http_proxy }}"
