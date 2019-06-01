@@ -18,15 +18,18 @@ dependencies:
       https_proxy: "{{ openshift_http_proxy }}"
       http_proxy: "{{ openshift_http_proxy }}"
     when: ansible_os_family == 'RedHat'
+    version: '1.2.3'
   - src: https://github.com/mtbvang/ansible-role-docker-1
     name: docker
     docker_http_proxy: "{{ openshift_http_proxy }}"
     docker_https_proxy: "{{ openshift_https_proxy }}"
     docker_no_proxy: "{{ openshift_docker_no_proxy }}"
-    docker_group_members: "{{ openshift_user }}"
+    docker_users: "{{ openshift_user }}"
     docker_version_rhel: 1.13.1
     docker_version_deb: 1.13.1*
     docker_yum_state: present
+    version: '0.2.1'
   - src: https://github.com/mtbvang/ansible-role-openshift_client
     name: openshift_client
+    version: '0.2.0'
   

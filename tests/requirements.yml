@@ -5,10 +5,12 @@
 #   name: docker-ubuntu
 - src: https://github.com/mtbvang/ansible-role-repo-epel
   name: epel
+  version: '1.2.3'
 - src: https://github.com/mtbvang/ansible-role-docker-1
   name: docker
+  version: '0.2.1'
 - src: https://github.com/mtbvang/ansible-role-ansible
   name: ansible
 - src: https://github.com/mtbvang/ansible-role-openshift_client
   name: openshift_client
-  version: v0.1.0
+  version: '0.2.0'

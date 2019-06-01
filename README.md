@@ -17,6 +17,7 @@ The vagrant boxes need to be built using the gradle task:
 Usage
 -----
 
+Insecure registries are added via the ExecStart variable in /etc/systemd/system/docker.service.d/docker.conf. This is configured in the tasks/subtasks/inc_docker_config.yml
 
 Role Variables
 --------------
